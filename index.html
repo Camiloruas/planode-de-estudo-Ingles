@@ -1,216 +1,37 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>English Study Tracker</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js"></script>
-  <style>
-    body { font-family: 'Inter', sans-serif; transition: background-color 0.3s, color 0.3s; }
-    .container { max-width: 900px; margin: 0 auto; padding: 24px; }
-    .task-row { transition: background-color 0.3s; }
-    .task-row:hover { background-color: #f1f5f9; }
-    .dark .task-row:hover { background-color: #374151; }
-    .details { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; }
-    .details.show { max-height: 300px; padding: 16px; background-color: #f9fafb; border-top: 1px solid #e5e7eb; }
-    .dark .details.show { background-color: #1f2937; border-top: 1px solid #4b5563; }
-    .progress-bar { height: 8px; border-radius: 4px; background-color: #e5e7eb; overflow: hidden; }
-    .progress-bar-fill { height: 100%; background: linear-gradient(to right, #3b82f6, #8b5cf6); transition: width 0.3s; }
-    .completed { text-decoration: line-through; color: #9ca3af; }
-    .toggle-btn { cursor: pointer; color: #3b82f6; }
-    .toggle-btn:hover { text-decoration: underline; }
-    .theme-toggle i { font-size: 1.5rem; }
-    .note-input { resize: none; width: 100%; border: 1px solid #d1d5db; border-radius: 4px; padding: 8px; }
-    .dark .note-input { border-color: #4b5563; background-color: #374151; color: #fff; }
-    @media (max-width: 640px) { .container { padding: 16px; } table { font-size: 0.875rem; } }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plano de Estudos de Inglês</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
-  <div class="container">
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold">Plano de Estudos de Inglês</h1>
-      <button id="themeToggle" class="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
-        <i class="fas fa-moon"></i>
-      </button>
+<body>
+    <div class="container">
+        <header>
+            <h1>Plano de Estudos de Inglês</h1>
+            <button id="theme-toggle" class="theme-toggle"><i class="fas fa-moon"></i></button>
+        </header>
+
+        <section class="progress-section">
+            <div class="progress-bar-container">
+                <div class="progress-bar"></div>
+            </div>
+            <p id="progress-text">0% Concluído</p>
+        </section>
+
+        <main>
+            <div id="activities-grid" class="activities-grid">
+                <!-- As atividades serão inseridas aqui pelo JavaScript -->
+            </div>
+        </main>
+
+        <footer>
+            <button id="reset-btn" class="reset-btn">Resetar Progresso</button>
+        </footer>
     </div>
-    <p class="text-gray-600 dark:text-gray-300 mb-4">Clique no nome da atividade para ver os detalhes. Marque as tarefas concluídas e adicione notas.</p>
-    <div class="mb-4">
-      <div class="text-sm font-medium text-gray-700 dark:text-gray-300">Progresso</div>
-      <div class="progress-bar">
-        <div id="progressBarFill" class="progress-bar-fill" style="width: 0%"></div>
-      </div>
-      <div id="progressText" class="text-sm text-gray-600 dark:text-gray-300 mt-1">0% concluído</div>
-    </div>
-    <button id="resetBtn" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 mb-4">Resetar Tarefas</button>
-    <table class="bg-white dark:bg-gray-800 rounded-lg shadow">
-      <thead>
-        <tr>
-          <th class="p-4">Atividade</th>
-          <th class="p-4">Tempo</th>
-          <th class="p-4">Concluído</th>
-        </tr>
-      </thead>
-      <tbody id="taskTable">
-        <tr class="task-row">
-          <td class="p-4 toggle-btn" data-task="reading">Leitura</td>
-          <td class="p-4">30 min</td>
-          <td class="p-4"><input type="checkbox" class="task-checkbox" data-task="reading"></td>
-        </tr>
-        <tr class="details" data-task="reading">
-          <td colspan="3">
-            <div>
-              <strong>Detalhes:</strong><br>
-              - <strong>10 min:</strong> Leia um artigo curto, post de blog ou notícia em inglês (ex.: BBC Learning English, The Guardian, ou posts no X). Escolha textos no seu nível ou ligeiramente acima.<br>
-              - <strong>10 min:</strong> Anote 5-10 palavras ou expressões novas em um caderno ou app (ex.: Quizlet). Pesquise seus significados e exemplos de uso.<br>
-              - <strong>10 min:</strong> Resuma o texto em 2-3 frases em inglês, focando na ideia principal.<br>
-              <strong>Notas:</strong><br>
-              <textarea class="note-input" data-task="reading" placeholder="Adicione suas anotações..."></textarea>
-            </div>
-          </td>
-        </tr>
-        <tr class="task-row">
-          <td class="p-4 toggle-btn" data-task="writing">Escrita</td>
-          <td class="p-4">30 min</td>
-          <td class="p-4"><input type="checkbox" class="task-checkbox" data-task="writing"></td>
-        </tr>
-        <tr class="details" data-task="writing">
-          <td colspan="3">
-            <div>
-              <strong>Detalhes:</strong><br>
-              - <strong>15 min:</strong> Escreva um parágrafo (5-7 frases) sobre um tema simples (ex.: seu dia, uma opinião sobre um filme, ou um post no X). Use pelo menos 3 palavras novas do dia.<br>
-              - <strong>10 min:</strong> Revise seu texto usando ferramentas como Grammarly ou DeepL Write para corrigir gramática e estilo.<br>
-              - <strong>5 min:</strong> Releia e reescreva uma frase que precise de melhoria.<br>
-              <strong>Notas:</strong><br>
-              <textarea class="note-input" data-task="writing" placeholder="Adicione suas anotações..."></textarea>
-            </div>
-          </td>
-        </tr>
-        <tr class="task-row">
-          <td class="p-4 toggle-btn" data-task="listening">Escuta</td>
-          <td class="p-4">30 min</td>
-          <td class="p-4"><input type="checkbox" class="task-checkbox" data-task="listening"></td>
-        </tr>
-        <tr class="details" data-task="listening">
-          <td colspan="3">
-            <div>
-              <strong>Detalhes:</strong><br>
-              - <strong>10 min:</strong> Ouça um podcast, vídeo do YouTube ou áudio curto (ex.: TED-Ed, BBC Learning English, ou clipes no X). Escolha algo com legendas, se necessário.<br>
-              - <strong>10 min:</strong> Ouça novamente, anotando 3-5 frases ou expressões-chave. Tente entender o contexto sem traduzir tudo.<br>
-              - <strong>10 min:</strong> Pratique shadowing: repita as frases imitando a pronúncia, entonação e ritmo do falante.<br>
-              <strong>Notas:</strong><br>
-              <textarea class="note-input" data-task="listening" placeholder="Adicione suas anotações..."></textarea>
-            </div>
-          </td>
-        </tr>
-        <tr class="task-row">
-          <td class="p-4 toggle-btn" data-task="speaking">Pronúncia</td>
-          <td class="p-4">30 min</td>
-          <td class="p-4"><input type="checkbox" class="task-checkbox" data-task="speaking"></td>
-        </tr>
-        <tr class="details" data-task="speaking">
-          <td colspan="3">
-            <div>
-              <strong>Detalhes:</strong><br>
-              - <strong>10 min:</strong> Use um app como Elsa Speak ou Speechling para praticar sons específicos (ex.: /θ/ vs. /ð/, ou vogais como /æ/ vs. /e/).<br>
-              - <strong>10 min:</strong> Grave-se lendo as frases anotadas na atividade de escuta. Compare com o áudio original.<br>
-              - <strong>10 min:</strong> Pratique uma conversa curta (ex.: se apresentar ou responder a uma pergunta comum) em voz alta, focando em clareza e entonação.<br>
-              <strong>Notas:</strong><br>
-              <textarea class="note-input" data-task="speaking" placeholder="Adicione suas anotações..."></textarea>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const checkboxes = document.querySelectorAll('.task-checkbox');
-      const toggleButtons = document.querySelectorAll('.toggle-btn');
-      const noteInputs = document.querySelectorAll('.note-input');
-      const progressBarFill = document.getElementById('progressBarFill');
-      const progressText = document.getElementById('progressText');
-      const themeToggle = document.getElementById('themeToggle');
-      const resetBtn = document.getElementById('resetBtn');
-
-      // Carregar tema
-      if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.body.classList.add('dark');
-        themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-      }
-
-      // Alternar tema
-      themeToggle.addEventListener('click', () => {
-        document.body.classList.toggle('dark');
-        localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
-        themeToggle.innerHTML = document.body.classList.contains('dark') ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-      });
-
-      // Atualizar progresso
-      function updateProgress() {
-        const totalTasks = checkboxes.length;
-        const completedTasks = Array.from(checkboxes).filter(cb => cb.checked).length;
-        const percentage = (completedTasks / totalTasks) * 100;
-        progressBarFill.style.width = `${percentage}%`;
-        progressText.textContent = `${Math.round(percentage)}% concluído`;
-      }
-
-      // Carregar estado dos checkboxes e notas
-      checkboxes.forEach(checkbox => {
-        const task = checkbox.getAttribute('data-task');
-        checkbox.checked = localStorage.getItem(task) === 'true';
-        updateRowStyle(checkbox);
-        checkbox.addEventListener('change', () => {
-          localStorage.setItem(task, checkbox.checked);
-          updateRowStyle(checkbox);
-          updateProgress();
-        });
-      });
-
-      noteInputs.forEach(input => {
-        const task = input.getAttribute('data-task');
-        input.value = localStorage.getItem(`note-${task}`) || '';
-        input.addEventListener('input', () => {
-          localStorage.setItem(`note-${task}`, input.value);
-        });
-      });
-
-      // Configurar botões de toggle
-      toggleButtons.forEach(button => {
-        button.addEventListener('click', () => {
-          const task = button.getAttribute('data-task');
-          const detailsRow = document.querySelector(`.details[data-task="${task}"]`);
-          detailsRow.classList.toggle('show');
-        });
-      });
-
-      // Botão de reset
-      resetBtn.addEventListener('click', () => {
-        if (confirm('Deseja resetar todas as tarefas e notas?')) {
-          checkboxes.forEach(checkbox => {
-            checkbox.checked = false;
-            localStorage.setItem(checkbox.getAttribute('data-task'), 'false');
-            updateRowStyle(checkbox);
-          });
-          noteInputs.forEach(input => {
-            input.value = '';
-            localStorage.setItem(`note-${input.getAttribute('data-task')}`, '');
-          });
-          document.querySelectorAll('.details').forEach(row => row.classList.remove('show'));
-          updateProgress();
-        }
-      });
-
-      // Inicializar progresso
-      updateProgress();
-    });
-
-    // Atualizar estilo da linha
-    function updateRowStyle(checkbox) {
-      const row = checkbox.closest('.task-row');
-      row.classList.toggle('completed', checkbox.checked);
-    }
-  </script>
+    <script src="script.js"></script>
 </body>
 </html>
